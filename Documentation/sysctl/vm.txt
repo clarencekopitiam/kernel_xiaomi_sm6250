@@ -63,6 +63,7 @@ Currently, these files are in /proc/sys/vm:
 - stat_interval
 - stat_refresh
 - swappiness
+- unprivileged_userfaultfd
 - user_reserve_kbytes
 - vfs_cache_pressure
 - watermark_scale_factor
@@ -884,6 +885,17 @@ vm.anon_min_kbytes, then only file pages can be reclaimed with
 any vm.swappiness value.
 
 The default value is 60.
+
+==============================================================
+
+unprivileged_userfaultfd
+
+This flag controls whether unprivileged users can use the userfaultfd
+system calls.  Set this to 1 to allow unprivileged users to use the
+userfaultfd system calls, or set this to 0 to restrict userfaultfd to only
+privileged users (with SYS_CAP_PTRACE capability).
+
+The default value is 1.
 
 ==============================================================
 
