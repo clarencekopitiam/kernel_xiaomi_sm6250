@@ -71,7 +71,7 @@ int ipa3_conn_qdss_pipes(struct ipa_qdss_conn_in_params *in,
 	struct gsi_chan_props gsi_channel_props;
 	struct ipa3_ep_context *ep_rx;
 	const struct ipa_gsi_ep_config *gsi_ep_info;
-	union __packed gsi_channel_scratch ch_scratch;
+	union gsi_channel_scratch ch_scratch;
 	u32 gsi_db_addr_low, gsi_db_addr_high;
 	struct ipa_ep_cfg ep_cfg = { { 0 } };
 	int ipa_ep_idx_rx, ipa_ep_idx_tx;
