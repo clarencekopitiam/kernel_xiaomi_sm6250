@@ -143,4 +143,16 @@ config SMB358_CHARGER
 	  The driver reports the charger status via the power supply framework.
 	  A charger status change triggers an IRQ via the device STAT pin.
 
+config PD_VERIFY
+	bool "usbpd digest verify"
+	default n
+	help
+	  Say Y to include support for usbpd digest verify.
+
+config J6B_CHARGE_THERMAL
+	bool "j6b charge thermal"
+	default n
+	help
+	  Say Y to include support for j6b charge thermal.
+
 endmenu
