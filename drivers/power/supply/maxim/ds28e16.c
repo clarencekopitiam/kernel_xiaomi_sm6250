@@ -1830,6 +1830,7 @@ static const struct file_operations ds28e16_dev_fops = {
 
 static const struct of_device_id ds28e16_dt_match[] = {
 	{.compatible = "maxim,ds28e16"},
+	{},
 };
 
 static struct platform_driver ds28e16_driver = {
@@ -1858,6 +1859,6 @@ static void __exit ds28e16_exit(void)
 module_init(ds28e16_init);
 module_exit(ds28e16_exit);
 
-MODULE_AUTHOR("aaabbb Inc.");
+MODULE_AUTHOR("xiaomi Inc.");
 MODULE_DESCRIPTION("ds28e16 driver");
 MODULE_LICENSE("GPL");

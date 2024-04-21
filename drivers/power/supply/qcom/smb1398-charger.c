@@ -1793,8 +1793,8 @@ static void smb1398_taper_work(struct work_struct *work)
 				TAPER_STEPPER_UA_IN_CC_MODE :
 				TAPER_STEPPER_UA_DEFAULT;
 
-			if(fast_charge_mode && (smb_en_reason == POWER_SUPPLY_CP_PPS)
-					&& (health == POWER_SUPPLY_HEALTH_GOOD)) {
+			if (fast_charge_mode && (smb_en_reason == POWER_SUPPLY_CP_PPS)
+					&& (health == POWER_SUPPLY_HEALTH_GOOD) && false) {
 				ffc_cp_exiting = true;
 				stepper_ua = TAPER_STEPPER_UA_SIX_PIN;
 				taper_ibat_offset = TAPER_IBAT_OFFSET_UA;

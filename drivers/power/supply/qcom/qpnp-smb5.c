@@ -748,6 +748,24 @@ static int smb5_parse_dt(struct smb5 *chip)
 		}
 	}
 #else
+	if (of_find_property(node, "qcom,thermal-mitigation-cp", &byte_len)) {
+		chg->thermal_mitigation_cp = devm_kzalloc(chg->dev, byte_len,
+			GFP_KERNEL);
+
+		if (chg->thermal_mitigation_cp == NULL)
+			return -ENOMEM;
+
+		chg->thermal_levels = byte_len / sizeof(u32);
+		rc = of_property_read_u32_array(node,
+				"qcom,thermal-mitigation-cp",
+				chg->thermal_mitigation_cp,
+				chg->thermal_levels);
+		if (rc < 0) {
+			dev_err(chg->dev,
+				"Couldn't read threm limits rc = %d\n", rc);
+			return rc;
+		}
+	}
 	if (of_find_property(node, "qcom,thermal-mitigation", &byte_len)) {
 		chg->thermal_mitigation = devm_kzalloc(chg->dev, byte_len,
 			GFP_KERNEL);
@@ -1297,6 +1315,10 @@ static int smb5_usb_set_prop(struct power_supply *psy,
 		if (chg->support_ffc) {
 			rc = smblib_set_fastcharge_mode(chg, val->intval);
 			power_supply_changed(chg->bms_psy);
+#ifdef CONFIG_BATT_VERIFY_BY_DS28E16
+			schedule_delayed_work(&chg->charger_soc_decimal,
+					msecs_to_jiffies(CHARGER_SOC_DECIMAL_MS));
+#endif
 		}
 		break;
 	case POWER_SUPPLY_PROP_PD_REMOVE_COMPENSATION:
@@ -3467,6 +3489,7 @@ static int smb5_determine_initial_status(struct smb5 *chip)
 	struct smb_charger *chg = &chip->chg;
 	union power_supply_propval val;
 	int rc;
+	//2019.12.11 longcheer xugui creates variable
 	int retries = 0;
 	u8 val1 = 0, val2 = 0;
 
@@ -3480,6 +3503,7 @@ static int smb5_determine_initial_status(struct smb5 *chip)
 	if (chg->bms_psy)
 		smblib_suspend_on_debug_battery(chg);
 
+	/*2020.02.18 longcheer xugui add start*/
 	/*Optimized delay time for find the right OTG interruption time*/
 	if (!val.intval) {
 		while (1) {
@@ -3492,6 +3516,7 @@ static int smb5_determine_initial_status(struct smb5 *chip)
 			break;
 		}
 	}
+	/*2020.02.18 longcheer xugui add end*/
 
 	usb_plugin_irq_handler(0, &irq_data);
 	typec_attach_detach_irq_handler(0, &irq_data);

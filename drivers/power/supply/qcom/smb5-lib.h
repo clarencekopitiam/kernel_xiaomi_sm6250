@@ -201,7 +201,7 @@ enum print_reason {
 #define STEP_CHG_DELAYED_HIGH_MONITOR_MS	5000
 #define STEP_CHG_DELAYED_QUICK_MONITOR_MS	3000
 #define STEP_CHG_DELAYED_START_MS		100
-#define VBAT_FOR_STEP_MIN_UV			4350000
+#define VBAT_FOR_STEP_MIN_UV			4450000
 #define VBAT_FOR_STEP_HYS_UV			20000
 
 #define SIX_PIN_VFLOAT_VOTER		"SIX_PIN_VFLOAT_VOTER"
@@ -217,6 +217,10 @@ enum print_reason {
 #define CP_COOL_THRESHOLD		150
 #define CP_WARM_THRESHOLD		450
 #define SOFT_JEITA_HYSTERESIS		5
+
+#ifdef CONFIG_BATT_VERIFY_BY_DS28E16
+	#define CHARGER_SOC_DECIMAL_MS		200
+#endif
 
 /* lct thermal */
 #ifdef CONFIG_J6B_CHARGE_THERMAL
@@ -608,6 +612,9 @@ struct smb_charger {
 	struct delayed_work	reg_work;
 	struct delayed_work	pr_lock_clear_work;
 	struct delayed_work	six_pin_batt_step_chg_work;
+#ifdef CONFIG_BATT_VERIFY_BY_DS28E16
+	struct delayed_work     charger_soc_decimal;
+#endif
 
 	struct alarm		lpd_recheck_timer;
 	struct alarm		moisture_protection_alarm;
@@ -651,6 +658,7 @@ struct smb_charger {
 	int 		*thermal_fcc_pps_cp;
 #else
 	int			*thermal_mitigation;
+	int			*thermal_mitigation_cp;
 #endif
 	int			dcp_icl_ua;
 	int			fake_capacity;
@@ -716,6 +724,7 @@ struct smb_charger {
 	int			charge_full_cc;
 	int			cc_soc_ref;
 	int			last_cc_soc;
+	int			term_vbat_uv;
 	int			dr_mode;
 	int			usbin_forced_max_uv;
 	int			init_thermal_ua;
