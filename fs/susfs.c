@@ -1162,10 +1162,10 @@ int susfs_sus_memfd(char *memfd_name) {
 }
 
 static void umount_mnt(struct path *path, int flags) {
-	int err = path_umount(path, flags);
-	if (err) {
-		SUSFS_LOGI("umount %s failed: %d\n", path->dentry->d_iname, err);
-	}
+	//int err = path_umount(path, flags);
+	//if (err) {
+		//SUSFS_LOGI("umount %s failed: %d\n", path->dentry->d_iname, err);
+	//}
 }
 
 static bool should_umount(struct path *path)
