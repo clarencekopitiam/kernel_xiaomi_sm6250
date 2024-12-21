@@ -48,7 +48,7 @@ jobs:
           KT_LINK: https://github.com/AzyrRuthless/kernel_xiaomi_sm6250
           KT_BRANCH: 15
         run: |
-          bash kinesis.sh
+          bash KinesisC.sh
 
       - name: 📂 List files for debugging
         run: ls -l
