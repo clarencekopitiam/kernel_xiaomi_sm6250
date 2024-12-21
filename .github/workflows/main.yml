@@ -1,0 +1,85 @@
+name: Build Kinesis (Cosmic Clang)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_kernel:
+    runs-on: ubuntu-latest
+    env:
+      ZIPNAME: "KINESIS-OMEGA-KSU-$(date '+%Y%m%d-%H%M').zip" # 🗜️ Define ZIP name here
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v2
+
+      - name: 🧰 Set up QEMU
+        uses: docker/setup-qemu-action@v1
+
+      - name: 🏗️ Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: 📦 Install dependencies and prepare environment
+        run: |
+          sudo apt update
+          sudo apt install -y git bison flex libxml2 libssl-dev bc zip default-jre python3 python3-pip wget curl cpio bash ccache
+          # Forcefully remove the 'kernel' directory
+          rm -rf kernel
+          echo "kernel directory removed forcefully."
+          # Forcefully remove the 'Azyr_Kernel' directory if exists
+          if [ -d "Azyr_Kernel" ]; then
+            echo "Azyr_Kernel directory exists. Deleting..."
+            rm -rf Azyr_Kernel
+            echo "Azyr_Kernel directory deleted."
+          fi
+
+      - name: 💽 Cache ccache
+        uses: actions/cache@v2
+        with:
+          path: /tmp/ccache
+          key: ${{ runner.os }}-ccache-${{ hashFiles('**/Makefile') }}
+          restore-keys: |
+            ${{ runner.os }}-ccache-
+
+      - name: 🚧 Build kernel
+        env:
+          TGID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          BOTID: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          KT_LINK: https://github.com/AzyrRuthless/kernel_xiaomi_sm6250
+          KT_BRANCH: 15
+        run: |
+          bash kinesis.sh
+
+      - name: 📂 List files for debugging
+        run: ls -l
+
+      - name: 📤 Upload Kernel Zip to Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-release
+          path: ${{ env.ZIPNAME }} # 📤 Specify the path to the zip file
+        if: always()
+
+      - name: 🎉 Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.run_number }}
+          release_name: Release ${{ github.run_number }}
+          draft: false
+          prerelease: false
+
+      - name: 🚀 Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ env.ZIPNAME }} # 🚀 Specify the path to the zip file for release
+          asset_name: ${{ env.ZIPNAME }}
+          asset_content_type: application/zip
